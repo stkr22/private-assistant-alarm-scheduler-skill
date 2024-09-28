@@ -1,7 +1,7 @@
 import enum
 import string
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Self
 
 import httpx
@@ -22,6 +22,7 @@ logger = SkillLogger.get_logger(__name__)
 
 class Parameters(BaseModel):
     alarm_time: datetime | None = None
+    alarm_name: str = "Default Cron Alarm"
 
 
 class Action(enum.Enum):
@@ -78,6 +79,7 @@ class AlarmSchedulerSkill(BaseSkill):
 
         # Set an alarm
         if action == Action.SET:
+            parameters.alarm_name = "User Alarm"
             parameters.alarm_time = datetime.now().replace(hour=6, minute=0, second=0, microsecond=0)
             for result in intent_analysis_result.numbers:
                 if result.next_token == "o'clock":
@@ -88,6 +90,8 @@ class AlarmSchedulerSkill(BaseSkill):
                     parameters.alarm_time = parameters.alarm_time.replace(minute=result.number_token)
                 elif result.next_token == "seconds":
                     parameters.alarm_time = parameters.alarm_time.replace(second=result.number_token)
+            if parameters.alarm_time < datetime.now():
+                parameters.alarm_time = parameters.alarm_time + timedelta(days=1)
 
         # Get the active alarm
         elif action in [Action.GET_ACTIVE, Action.CONTINUE, Action.SKIP]:
@@ -99,7 +103,7 @@ class AlarmSchedulerSkill(BaseSkill):
 
         return parameters
 
-    def register_alarm(self, parameters: Parameters, user_alarm: bool = False) -> None:
+    def register_alarm(self, parameters: Parameters) -> None:
         """Registers an alarm in the database and sets a timer for it."""
         with Session(self.db_engine) as session:
             # Remove any existing alarm as we only support one active alarm at a time
@@ -110,7 +114,7 @@ class AlarmSchedulerSkill(BaseSkill):
 
             # Register new alarm
             active_alarm = models.ASSActiveAlarm(
-                name="User Alarm" if user_alarm else "Default Cron Alarm",
+                name=parameters.alarm_name,
                 scheduled_time=parameters.alarm_time,
             )
             session.add(active_alarm)

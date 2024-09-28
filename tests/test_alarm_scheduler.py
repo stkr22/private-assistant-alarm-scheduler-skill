@@ -1,9 +1,10 @@
 import unittest
+import uuid
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 import jinja2
-from private_assistant_commons import messages
+from private_assistant_commons import ClientRequest, IntentAnalysisResult, NumberAnalysisResult, messages
 
 from private_assistant_alarm_scheduler_skill import models
 from private_assistant_alarm_scheduler_skill.alarm_scheduler_skill import Action, AlarmSchedulerSkill, Parameters
@@ -135,3 +136,29 @@ class TestAlarmScheduler(unittest.TestCase):
 
             # Verify the alarm schedule was resumed
             mock_set_next_alarm_from_cron.assert_called_once()
+
+    def test_process_request_set(self):
+        # Mock the IntentAnalysisResult
+        now_time = (datetime.now() + timedelta(hours=2)).hour
+        mock_client_request = ClientRequest(
+            id=uuid.uuid4(), text=f"set an alarm for {now_time} o'clock", output_topic="test_topic", room="livingroom"
+        )
+
+        mock_number_analysis_result = NumberAnalysisResult(number_token=now_time, next_token="o'clock")
+        mock_intent_result = IntentAnalysisResult(
+            client_request=mock_client_request, numbers=[mock_number_analysis_result], nouns=["alarm"], verbs=["set"]
+        )
+
+        parameters = Parameters(alarm_time=datetime.now().replace(hour=now_time, minute=0, second=0, microsecond=0))
+        active_alarm = models.ASSActiveAlarm(
+            name="User Alarm",
+            scheduled_time=parameters.alarm_time,
+        )
+
+        with patch("private_assistant_alarm_scheduler_skill.alarm_scheduler_skill.Session") as mock_session:
+            mock_session_instance = mock_session.return_value.__enter__.return_value
+            self.skill.process_request(mock_intent_result)
+
+            # Verify that the alarm was added to the session and committed
+            mock_session_instance.add.assert_called_with(active_alarm)
+            mock_session_instance.commit.assert_called()
