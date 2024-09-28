@@ -222,12 +222,16 @@ class AlarmSchedulerSkill(BaseSkill):
         parameters = self.find_parameters(action, intent_analysis_result=intent_analysis_result)
         if action == Action.SET:
             self.register_alarm(parameters)
+        elif action == Action.HELP:
+            pass
+        elif action == Action.SKIP:
+            self.skip_alarm()
         elif action == Action.BREAK:
             self.break_execution()
         elif action == Action.CONTINUE:
             self.set_next_alarm_from_cron()
-        elif action == Action.SKIP:
-            self.skip_alarm()
+        elif action == Action.GET_ACTIVE:
+            pass
         else:
             logger.debug("No specific action implemented for action: %s", action)
             return
