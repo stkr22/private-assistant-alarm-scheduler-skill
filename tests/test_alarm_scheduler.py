@@ -36,7 +36,7 @@ class TestAlarmScheduler(unittest.TestCase):
 
         parameters = Parameters(alarm_time=datetime(2023, 3, 15, 6, 30))
         active_alarm = models.ASSActiveAlarm(
-            name="User Alarm",
+            name=parameters.alarm_name,
             scheduled_time=parameters.alarm_time,
         )
 
@@ -45,7 +45,7 @@ class TestAlarmScheduler(unittest.TestCase):
             mock_session_instance.exec.return_value.all.return_value = []
 
             # Call the register_alarm method
-            self.skill.register_alarm(parameters, mock_client_request)
+            self.skill.register_alarm(parameters)
 
             # Verify that the alarm was added to the session and committed
             mock_session_instance.add.assert_called_with(active_alarm)
