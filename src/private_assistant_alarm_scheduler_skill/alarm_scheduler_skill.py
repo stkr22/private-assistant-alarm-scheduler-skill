@@ -115,16 +115,16 @@ class AlarmSchedulerSkill(BaseSkill):
             )
             session.add(active_alarm)
             session.commit()
-        logger.debug("Alarm set for %s.", parameters.alarm_time)
+            scheduled_time = active_alarm.scheduled_time
+        logger.debug("Alarm set for %s.", scheduled_time)
 
         # Set a timer for the registered alarm
 
-        self.set_next_alarm(active_alarm)
+        self.set_next_alarm(scheduled_time)
 
-    def set_next_alarm(self, active_alarm: models.ASSActiveAlarm) -> None:
+    def set_next_alarm(self, scheduled_time: datetime) -> None:
         """Sets the next alarm timer."""
-        next_execution = active_alarm.scheduled_time
-        time_until_alarm = (next_execution - datetime.now()).total_seconds()
+        time_until_alarm = (scheduled_time - datetime.now()).total_seconds()
 
         with self.timer_lock:
             # Cancel any existing timer
@@ -133,10 +133,10 @@ class AlarmSchedulerSkill(BaseSkill):
                 logger.debug("Existing alarm timer canceled before registering a new one.")
 
             # Register the new timer
-            self.active_timer = threading.Timer(time_until_alarm, self.trigger_alarm, [next_execution])
+            self.active_timer = threading.Timer(time_until_alarm, self.trigger_alarm, [scheduled_time])
             self.active_timer.daemon = True
             self.active_timer.start()
-            logger.debug("New alarm set for %s.", next_execution)
+            logger.debug("New alarm set for %s.", scheduled_time)
 
     def trigger_alarm(self, alarm_time: datetime) -> None:
         """Trigger the webhook for the active alarm."""

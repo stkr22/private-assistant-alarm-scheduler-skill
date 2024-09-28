@@ -86,14 +86,10 @@ class TestAlarmScheduler(unittest.TestCase):
     def test_set_next_alarm(self):
         # Mock datetime and threading.Timer
         mock_next_execution = datetime.now() + timedelta(hours=5)
-        active_alarm = models.ASSActiveAlarm(
-            name="User Alarm",
-            scheduled_time=mock_next_execution,
-        )
 
         with patch("private_assistant_alarm_scheduler_skill.alarm_scheduler_skill.threading.Timer") as mock_timer:
             # Call the set_next_alarm method
-            self.skill.set_next_alarm(active_alarm)
+            self.skill.set_next_alarm(mock_next_execution)
 
             # Verify that a new timer was started
             mock_timer.assert_called_once()
