@@ -90,7 +90,7 @@ class AlarmSchedulerSkill(BaseSkill):
                     parameters.alarm_time = parameters.alarm_time.replace(second=result.number_token)
 
         # Get the active alarm
-        elif action == Action.GET_ACTIVE:
+        elif action in [Action.GET_ACTIVE, Action.CONTINUE, Action.SKIP]:
             with Session(self.db_engine) as session:
                 statement = select(models.ASSActiveAlarm).where(models.ASSActiveAlarm.scheduled_time > datetime.now())
                 active_alarm = session.exec(statement).first()
