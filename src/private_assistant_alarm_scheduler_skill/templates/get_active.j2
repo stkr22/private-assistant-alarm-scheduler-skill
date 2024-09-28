@@ -1,0 +1,5 @@
+{% if parameters.alarm_time -%}
+Current active alarm is set for {{ parameters.alarm_time.strftime("%A, %B %d at %H:%M") }}.
+{%- else -%}
+No active alarm is set at the moment.
+{%- endif %}
