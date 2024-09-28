@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier
+_commit: 0.1.3
+_src_path: gh:stkr22/copier-python-project
+author_email: stkr22@github.com
+author_full_name: stkr22
+copyright_license: GNU General Public License v3.0
+project_description: A Python skill for scheduling and managing persistent alarms
+    with support for recurring events, using cron expressions and webhook integration
+    for immediate triggering external alarms.
+project_name: Private Assistant Alarm Scheduler Skill
+python_package_distribution_name: private-assistant-alarm-scheduler-skill
+python_package_import_name: private_assistant_alarm_scheduler_skill
+version: 0.1.0
