@@ -29,6 +29,7 @@ ruff = "^0.6.8"
 mypy = "^1.11.2"
 pytest = "^8.3.3"
 types-croniter = "^3.0.3.20240731"
+respx = "^0.21.1"
 
 [tool.poetry.scripts]
 private-assistant-alarm-scheduler-skill = "private_assistant_alarm_scheduler_skill.main:app"

@@ -4,17 +4,38 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 import jinja2
+import respx
+from httpx import Response
 from private_assistant_commons import ClientRequest, IntentAnalysisResult, NumberAnalysisResult, messages
 
 from private_assistant_alarm_scheduler_skill import models
-from private_assistant_alarm_scheduler_skill.alarm_scheduler_skill import Action, AlarmSchedulerSkill, Parameters
+from private_assistant_alarm_scheduler_skill.alarm_scheduler_skill import (
+    Action,
+    AlarmSchedulerSkill,
+    Parameters,
+    logger,
+)
 
 
-class TestAlarmScheduler(unittest.TestCase):
+class MockedAPIMixin:
+    @classmethod
+    def setUpClass(cls):
+        # Set up the base mocked API
+        cls.mocked_api = respx.mock(base_url="https://example.org/api", assert_all_called=False)
+
+    def setUp(self):
+        # Start the mocked API for each test case
+        self.mocked_api.start()
+        self.addCleanup(self.mocked_api.stop)
+
+
+class TestAlarmScheduler(MockedAPIMixin, unittest.TestCase):
     def setUp(self):
         # Mock the MQTT client, config, and Jinja2 template environment
+        super().setUp()
         self.mock_mqtt_client = Mock()
         self.mock_config = Mock()
+        self.mock_config.webhook_url = "https://example.org/api"
         self.mock_template_env = jinja2.Environment(
             loader=jinja2.PackageLoader(
                 "private_assistant_alarm_scheduler_skill",
@@ -50,6 +71,42 @@ class TestAlarmScheduler(unittest.TestCase):
             # Verify that the alarm was added to the session and committed
             mock_session_instance.add.assert_called_with(active_alarm)
             mock_session_instance.commit.assert_called()
+
+    def test_trigger_alarm_success(self):
+        with patch.object(self.skill, "set_next_alarm_from_cron") as mock_set_next_alarm_from_cron:
+            # Set up the mocked API route for success
+            alarm_time = datetime(2023, 3, 15, 6, 30)
+            self.mocked_api.post("/", name="trigger_alarm_success").return_value = Response(
+                200, json={"message": "success"}
+            )
+
+            # Call the trigger_alarm method
+            self.skill.trigger_alarm(alarm_time)
+
+            # Verify the call
+            self.assertTrue(self.mocked_api["trigger_alarm_success"].called)
+            self.assertEqual(self.mocked_api.calls.call_count, 1)
+            mock_set_next_alarm_from_cron.assert_called_once()
+
+    def test_trigger_alarm_failure(self):
+        with patch.object(self.skill, "set_next_alarm_from_cron") as mock_set_next_alarm_from_cron:
+            # Set up the mocked API route for failure
+            alarm_time = datetime(2023, 3, 15, 6, 30)
+            self.mocked_api.post("/", name="trigger_alarm_failure").return_value = Response(
+                500, json={"error": "internal server error"}
+            )
+
+            with self.assertLogs(logger, level="ERROR") as cm:
+                # Call the trigger_alarm method
+                self.skill.trigger_alarm(alarm_time)
+
+                # Check that an error log is generated
+                self.assertTrue(any("Failed to trigger alarm" in message for message in cm.output))
+
+            # Verify the call
+            self.assertTrue(self.mocked_api["trigger_alarm_failure"].called)
+            self.assertEqual(self.mocked_api.calls.call_count, 1)
+            mock_set_next_alarm_from_cron.assert_called_once()
 
     def test_break_execution(self):
         with patch("private_assistant_alarm_scheduler_skill.alarm_scheduler_skill.Session") as mock_session:
