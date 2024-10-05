@@ -1,6 +1,6 @@
 {
 	"name": "private-assistant-alarm-scheduler-skill-dev-environment",
-	"image": "mcr.microsoft.com/devcontainers/python:3.11",
+	"image": "mcr.microsoft.com/devcontainers/python:3.12",
 	"runArgs": [
 		"--userns=keep-id"
 	],

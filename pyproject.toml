@@ -4,38 +4,36 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "private-assistant-alarm-scheduler-skill"
-version = "0.1.4"
+version = "1.0.0"
 description = "A Python skill for scheduling and managing persistent alarms with support for recurring events, using cron expressions and webhook integration for immediate triggering external alarms."
 authors = ["stkr22 <stkr22@github.com>"]
 readme = "README.md"
 license = "GNU General Public License v3.0"
-include = ["src"]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
-paho-mqtt = "^2.1.0"
-private-assistant-commons = "^0.1.6"
+python = ">=3.11,<3.13"
+private-assistant-commons = "^1.1.0"
 pydantic = "^2.9.2"
 sqlmodel = "^0.0.22"
-psycopg2-binary = "^2.9.9"
 httpx = "^0.27.2"
 typer = {extras = ["all"], version = "^0.12.5"}
 jinja2 = "^3.1.4"
-pyyaml = "^6.0.2"
 croniter = "^3.0.3"
+asyncpg = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.6.8"
+ruff = "^0.6.9"
 mypy = "^1.11.2"
 pytest = "^8.3.3"
 types-croniter = "^3.0.3.20240731"
 respx = "^0.21.1"
+aiosqlite = "^0.20.0"
 
 [tool.poetry.scripts]
 private-assistant-alarm-scheduler-skill = "private_assistant_alarm_scheduler_skill.main:app"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 120
 indent-width = 4
 
