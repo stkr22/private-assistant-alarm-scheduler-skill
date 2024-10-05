@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "private-assistant-alarm-scheduler-skill"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Python skill for scheduling and managing persistent alarms with support for recurring events, using cron expressions and webhook integration for immediate triggering external alarms."
 authors = ["stkr22 <stkr22@github.com>"]
 readme = "README.md"

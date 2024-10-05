@@ -93,8 +93,8 @@ class AlarmSchedulerSkill(BaseSkill):
             if parameters.alarm_time < datetime.now():
                 parameters.alarm_time += timedelta(days=1)
 
-        # Get the active alarm
-        elif action in [Action.GET_ACTIVE, Action.CONTINUE, Action.SKIP]:
+        elif action == Action.GET_ACTIVE:
+            # Retrieve the currently active alarm from the database
             async with AsyncSession(self.db_engine) as session:
                 statement = select(models.ASSActiveAlarm).where(models.ASSActiveAlarm.scheduled_time > datetime.now())
                 query_result = await session.exec(statement)
@@ -102,7 +102,35 @@ class AlarmSchedulerSkill(BaseSkill):
                 if active_alarm:
                     parameters.alarm_time = active_alarm.scheduled_time
 
+        elif action == Action.CONTINUE:
+            # Calculate the next alarm time based on the cron expression
+            parameters.alarm_time = self.calculate_next_cron_execution(skip_next=False)
+
+        elif action == Action.SKIP:
+            # Calculate the alarm time after the next occurrence
+            parameters.alarm_time = self.calculate_next_cron_execution(skip_next=True)
+
         return parameters
+
+    def calculate_next_cron_execution(self, skip_next: bool = False) -> datetime:
+        """Calculates the next cron-based execution time.
+
+        Args:
+            skip_next (bool): If True, skip the next cron occurrence and return the one after that.
+
+        Returns:
+            datetime: The calculated next execution time.
+        """
+        cron_expression = self.config_obj.cron_expression
+        now = datetime.now()
+        cron_iter = croniter(cron_expression, now)
+
+        # Skip the next occurrence if needed
+        if skip_next:
+            cron_iter.get_next(datetime)
+
+        next_execution = cron_iter.get_next(datetime)
+        return next_execution
 
     async def register_alarm(self, parameters: Parameters) -> None:
         async with AsyncSession(self.db_engine) as session:
@@ -158,13 +186,12 @@ class AlarmSchedulerSkill(BaseSkill):
         await self.set_next_alarm_from_cron()
 
     async def set_next_alarm_from_cron(self) -> None:
-        cron_expression = self.config_obj.cron_expression
-        now = datetime.now()
-        cron_iter = croniter(cron_expression, now)
-        next_execution = cron_iter.get_next(datetime)
-
+        """Sets the next alarm based on the cron schedule."""
+        # Calculate the next cron-based execution time
+        next_execution = self.calculate_next_cron_execution(skip_next=False)
         parameters = Parameters(alarm_time=next_execution)
         await self.register_alarm(parameters)
+        self.logger.info("Setting next cron iteration as alarm %s.", next_execution)
 
     async def break_execution(self) -> None:
         async with AsyncSession(self.db_engine) as session:
@@ -181,20 +208,12 @@ class AlarmSchedulerSkill(BaseSkill):
             self.logger.info("All alarms and timers have been stopped.")
 
     async def skip_alarm(self) -> None:
-        """Skips the next alarm by calculating the next one after the immediate next cron iteration."""
-        cron_expression = self.config_obj.cron_expression
-        now = datetime.now()
-
-        # Parse and skip the next cron iteration
-        cron_iter = croniter(cron_expression, now)
-        cron_iter.get_next(datetime)  # Skip the next iteration
-        next_execution = cron_iter.get_next(datetime)
-
-        parameters = Parameters(alarm_time=next_execution)
-
-        # Set the alarm for the skipped iteration's next time
+        """Skips the next occurrence of the cron and sets the alarm for the one after."""
+        # Calculate the alarm time after skipping the next occurrence
+        second_next_execution = self.calculate_next_cron_execution(skip_next=True)
+        parameters = Parameters(alarm_time=second_next_execution)
         await self.register_alarm(parameters)
-        self.logger.info("Skipped the next cron iteration and set the alarm for %s.", next_execution)
+        self.logger.info("Skipped the next cron iteration and set the alarm for %s.", second_next_execution)
 
     def get_answer(self, action: Action, parameters: Parameters) -> str:
         template = self.action_to_answer.get(action)
