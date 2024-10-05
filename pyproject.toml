@@ -9,10 +9,9 @@ description = "A Python skill for scheduling and managing persistent alarms with
 authors = ["stkr22 <stkr22@github.com>"]
 readme = "README.md"
 license = "GNU General Public License v3.0"
-include = ["src"]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.11,<3.13"
 paho-mqtt = "^2.1.0"
 private-assistant-commons = "^0.1.6"
 pydantic = "^2.9.2"
@@ -35,7 +34,7 @@ respx = "^0.21.1"
 private-assistant-alarm-scheduler-skill = "private_assistant_alarm_scheduler_skill.main:app"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 120
 indent-width = 4
 
