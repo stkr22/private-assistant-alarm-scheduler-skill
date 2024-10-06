@@ -147,9 +147,9 @@ class AlarmSchedulerSkill(BaseSkill):
                 scheduled_time=parameters.alarm_time,
             )
             session.add(active_alarm)
-            await session.commit()
             scheduled_time = active_alarm.scheduled_time
-        self.logger.debug("Alarm set for %s.", scheduled_time)
+            await session.commit()
+            self.logger.debug("Alarm set for %s.", scheduled_time)
 
         self.set_next_alarm(scheduled_time)
 
@@ -237,7 +237,7 @@ class AlarmSchedulerSkill(BaseSkill):
         parameters = await self.find_parameters(action, intent_analysis_result=intent_analysis_result)
 
         if action == Action.SET:
-            self.add_task(self.register_alarm(parameters))
+            await self.register_alarm(parameters)
         elif action == Action.HELP:
             pass
         elif action == Action.SKIP:
