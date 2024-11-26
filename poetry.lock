@@ -570,20 +570,20 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "private-assistant-commons"
-version = "1.1.0"
+version = "2.0.0"
 description = "Common utilities and base functionalities for all skills in the Private Assistant ecosystem."
 optional = false
 python-versions = "<3.13,>=3.11"
 files = [
-    {file = "private_assistant_commons-1.1.0-py3-none-any.whl", hash = "sha256:53081d0499f6897e9d25d28e780a018a3affc6ca460339ac2a4a9639af329f8f"},
-    {file = "private_assistant_commons-1.1.0.tar.gz", hash = "sha256:a156734672cbe7eaaec70643c5cfe46736d4314fdf39d19f02f18b7fe65b65bd"},
+    {file = "private_assistant_commons-2.0.0-py3-none-any.whl", hash = "sha256:ee37c4803571d380a187628196c644270bc0cc7fd50b620cb6bfbff5e2995e9e"},
+    {file = "private_assistant_commons-2.0.0.tar.gz", hash = "sha256:931757c5a9f7aef1d4e19b1b8ced11bbd87502572bff3cb048ce4e3285fe39c5"},
 ]
 
 [package.dependencies]
 aiomqtt = ">=2.3.0,<3.0.0"
-pydantic = ">=2.8.2,<3.0.0"
+pydantic = ">=2.9.2,<3.0.0"
 pyyaml = ">=6.0.1,<7.0.0"
-typer = {version = ">=0.12.5,<0.13.0", extras = ["all"]}
+typer = ">=0.13.0,<0.14.0"
 
 [[package]]
 name = "pydantic"
@@ -1023,13 +1023,13 @@ SQLAlchemy = ">=2.0.14,<2.1.0"
 
 [[package]]
 name = "typer"
-version = "0.12.5"
+version = "0.13.1"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typer-0.12.5-py3-none-any.whl", hash = "sha256:62fe4e471711b147e3365034133904df3e235698399bc4de2b36c8579298d52b"},
-    {file = "typer-0.12.5.tar.gz", hash = "sha256:f592f089bedcc8ec1b974125d64851029c3b1af145f04aca64d69410f0c9b722"},
+    {file = "typer-0.13.1-py3-none-any.whl", hash = "sha256:5b59580fd925e89463a29d363e0a43245ec02765bde9fb77d39e5d0f29dd7157"},
+    {file = "typer-0.13.1.tar.gz", hash = "sha256:9d444cb96cc268ce6f8b94e13b4335084cef4c079998a9f4851a90229a3bd25c"},
 ]
 
 [package.dependencies]
@@ -1063,4 +1063,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "08b6fe6cb2de20f62ef27980b48fbd4e4d40374dd462a0d21f6b2867d1b52a6f"
+content-hash = "63eaa477f04473ed6dda6bc88f7aead15ce958a08ab6b0ed553023a879d9d764"

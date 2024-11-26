@@ -253,4 +253,4 @@ class AlarmSchedulerSkill(BaseSkill):
             return
 
         answer = self.get_answer(action, parameters)
-        self.add_task(self.add_text_to_output_topic(answer, client_request=intent_analysis_result.client_request))
+        self.add_task(self.send_response(answer, client_request=intent_analysis_result.client_request))
