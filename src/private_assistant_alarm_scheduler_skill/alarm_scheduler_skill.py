@@ -72,6 +72,15 @@ class AlarmSchedulerSkill(BaseSkill):
             return 1.0  # Maximum certainty if "alarm" is detected in the user's request
         return 0.0
 
+    async def skill_preparations(self) -> None:
+        async with AsyncSession(self.db_engine) as session:
+            statement = select(models.ASSActiveAlarm).where(models.ASSActiveAlarm.scheduled_time > datetime.now())
+            query_result = await session.exec(statement)
+            active_alarm = query_result.first()
+            if active_alarm:
+                self.logger.info("Active alarm found from previous session, starting alarm task.")
+                self.set_next_alarm(active_alarm.scheduled_time)
+
     async def find_parameters(
         self, action: Action, intent_analysis_result: messages.IntentAnalysisResult
     ) -> Parameters:
