@@ -384,6 +384,7 @@ dependencies = [
     { name = "private-assistant-commons" },
     { name = "pydantic" },
     { name = "sqlmodel" },
+    { name = "typer" },
 ]
 
 [package.dev-dependencies]
@@ -404,9 +405,10 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27.2,<0.28.0" },
     { name = "humanize", specifier = ">=4.11.0" },
     { name = "jinja2", specifier = ">=3.1.4,<4.0.0" },
-    { name = "private-assistant-commons", specifier = ">=2.1.0,<3.0.0" },
+    { name = "private-assistant-commons", specifier = ">=3.0.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
     { name = "sqlmodel", specifier = ">=0.0.22,<0.1.0" },
+    { name = "typer", specifier = ">=0.15.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -422,17 +424,16 @@ dev = [
 
 [[package]]
 name = "private-assistant-commons"
-version = "2.1.0"
+version = "3.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiomqtt" },
     { name = "pydantic" },
     { name = "pyyaml" },
-    { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/61/cb/f938ab156950a0a8526292eed647af0f67f3980b26f492f5665202469ed5/private_assistant_commons-2.1.0.tar.gz", hash = "sha256:7b3e0bf80112964af00dd748158ce6512620c523faf8b1d5b33660b7ec5e18c6", size = 19570 }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/20/9d952453abafd3fb3fd3e82d1d6690d03053b5103c3c5307c03c5e67fdc1/private_assistant_commons-3.0.0.tar.gz", hash = "sha256:d98e95b9d8fd2e84387b2021ca62d12f290304243bd8ef076d6896689a86888f", size = 39745 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/d5/41db129a0227f2a88065b4e438522df120c342c9d3a3f690ddb6d5ced6ad/private_assistant_commons-2.1.0-py3-none-any.whl", hash = "sha256:200f8cb0f186cfa887743f6fc02a5896ede2f31990ff6f9b40a3d5eeb53c8630", size = 21427 },
+    { url = "https://files.pythonhosted.org/packages/1c/da/97660c4e61f40d9b476db591d1cffbaa0602a8cc130741b722072d99eadf/private_assistant_commons-3.0.0-py3-none-any.whl", hash = "sha256:1c5c6d46772f8ba5a33559b99dbb34b17a1a8dffe10eb6241ab8aa1eaeead4cd", size = 21183 },
 ]
 
 [[package]]
@@ -722,7 +723,7 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.13.1"
+version = "0.15.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -730,9 +731,9 @@ dependencies = [
     { name = "shellingham" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/76/41/49ead3ad3310545e767bcb917c759b026ca9eada5d5c150c2fb6fc555568/typer-0.13.1.tar.gz", hash = "sha256:9d444cb96cc268ce6f8b94e13b4335084cef4c079998a9f4851a90229a3bd25c", size = 98631 }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/ce/dca7b219718afd37a0068f4f2530a727c2b74a8b6e8e0c0080a4c0de4fcd/typer-0.15.1.tar.gz", hash = "sha256:a0588c0a7fa68a1978a069818657778f86abe6ff5ea6abf472f940a08bfe4f0a", size = 99789 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/22/69/e90a0b4d0c16e095901679216c8ecdc728110c7c54e7b5f43a623bc4c789/typer-0.13.1-py3-none-any.whl", hash = "sha256:5b59580fd925e89463a29d363e0a43245ec02765bde9fb77d39e5d0f29dd7157", size = 44723 },
+    { url = "https://files.pythonhosted.org/packages/d0/cc/0a838ba5ca64dc832aa43f727bd586309846b0ffb2ce52422543e6075e8a/typer-0.15.1-py3-none-any.whl", hash = "sha256:7994fb7b8155b64d3402518560648446072864beefd44aa2dc36972a5972e847", size = 44908 },
 ]
 
 [[package]]

@@ -4,18 +4,22 @@ from typing import Annotated
 
 import jinja2
 import typer
-from private_assistant_commons import async_typer, mqtt_connection_handler, skill_config, skill_logger
+from private_assistant_commons import mqtt_connection_handler, skill_config, skill_logger
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 
 from private_assistant_alarm_scheduler_skill import alarm_scheduler_skill, config
 
-app = async_typer.AsyncTyper()
+app = typer.Typer()
 
 
-@app.async_command()
+@app.command()
+def main(config_path: Annotated[pathlib.Path, typer.Argument(envvar="PRIVATE_ASSISTANT_CONFIG_PATH")]) -> None:
+    asyncio.run(start_skill(config_path))
+
+
 async def start_skill(
-    config_path: Annotated[pathlib.Path, typer.Argument(envvar="PRIVATE_ASSISTANT_CONFIG_PATH")],
+    config_path: pathlib.Path,
 ):
     # Set up logger early on
     logger = skill_logger.SkillLogger.get_logger("Private Assistant AlarmSchedulerSkill")
@@ -50,4 +54,4 @@ async def start_skill(
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(start_skill(config_path=pathlib.Path("./local_config.yaml")))
+    app()
