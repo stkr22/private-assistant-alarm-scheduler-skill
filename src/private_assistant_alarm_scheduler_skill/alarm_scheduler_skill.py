@@ -91,9 +91,7 @@ class AlarmSchedulerSkill(BaseSkill):
             parameters.alarm_name = "User Alarm"
             parameters.alarm_time = datetime.now().replace(hour=6, minute=0, second=0, microsecond=0)
             for result in intent_analysis_result.numbers:
-                if result.next_token == "o'clock":
-                    parameters.alarm_time = parameters.alarm_time.replace(hour=result.number_token)
-                elif result.next_token == "hours":
+                if result.next_token == "o'clock" or result.next_token == "hours":
                     parameters.alarm_time = parameters.alarm_time.replace(hour=result.number_token)
                 elif result.next_token == "minutes":
                     parameters.alarm_time = parameters.alarm_time.replace(minute=result.number_token)
@@ -138,8 +136,7 @@ class AlarmSchedulerSkill(BaseSkill):
         if skip_next:
             cron_iter.get_next(datetime)
 
-        next_execution = cron_iter.get_next(datetime)
-        return next_execution
+        return cron_iter.get_next(datetime)  # type: ignore
 
     async def register_alarm(self, parameters: Parameters) -> None:
         async with AsyncSession(self.db_engine) as session:
@@ -233,9 +230,8 @@ class AlarmSchedulerSkill(BaseSkill):
             )
             self.logger.debug("Generated answer using template for action %s.", action)
             return answer
-        else:
-            self.logger.error("No template found for action %s.", action)
-            return "Sorry, I couldn't process your request."
+        self.logger.error("No template found for action %s.", action)
+        return "Sorry, I couldn't process your request."
 
     async def process_request(self, intent_analysis_result: messages.IntentAnalysisResult) -> None:
         action = Action.find_matching_action(intent_analysis_result.client_request.text)

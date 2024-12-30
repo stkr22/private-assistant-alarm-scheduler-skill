@@ -162,9 +162,8 @@ class TestAlarmSchedulerSkill(unittest.IsolatedAsyncioTestCase):
             name="Test Alarm",
             scheduled_time=datetime.now() + timedelta(hours=1),
         )
-        async with AsyncSession(self.engine_async) as session:
-            async with session.begin():
-                session.add(mock_alarm)
+        async with AsyncSession(self.engine_async) as session, session.begin():
+            session.add(mock_alarm)
 
         # Set a mock active timer task
         self.skill._active_alarm_task = AsyncMock()
