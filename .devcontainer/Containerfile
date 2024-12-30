@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/devcontainers/base@sha256:4807916fa13f4f2a4d1ced226a31f71bc49e40864bf0825e7196f0a52a535a2c
+COPY --from=ghcr.io/astral-sh/uv:0.5.9 /uv /uvx /bin/
+ENV VIRTUAL_ENV=/workspaces/.venv
+ENV UV_PROJECT_ENVIRONMENT=/workspaces/.venv
+RUN mkdir -p /workspaces && \
+    chown -R vscode:vscode /workspaces
+USER vscode

@@ -1,35 +1,51 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "private-assistant-alarm-scheduler-skill"
 version = "1.1.0"
 description = "A Python skill for scheduling and managing persistent alarms with support for recurring events, using cron expressions and webhook integration for immediate triggering external alarms."
-authors = ["stkr22 <stkr22@github.com>"]
+authors = [
+    { name = "stkr22", email = "stkr22@github.com" }
+]
 readme = "README.md"
-license = "GNU General Public License v3.0"
+license = { text = "GNU General Public License v3.0" }
 
-[tool.poetry.dependencies]
-python = ">=3.11,<3.13"
-private-assistant-commons = "^2.1.0"
-pydantic = "^2.9.2"
-sqlmodel = "^0.0.22"
-httpx = "^0.27.2"
-jinja2 = "^3.1.4"
-croniter = "^3.0.3"
-asyncpg = "^0.29.0"
+keywords = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Home Automation",
+]
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.6.9"
-mypy = "^1.11.2"
-pytest = "^8.3.3"
-types-croniter = "^3.0.3.20240731"
-respx = "^0.21.1"
-aiosqlite = "^0.20.0"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "private-assistant-commons>=2.1.0,<3.0.0",
+    "pydantic>=2.9.2,<3.0.0",
+    "sqlmodel>=0.0.22,<0.1.0",
+    "httpx>=0.27.2,<0.28.0",
+    "jinja2>=3.1.4,<4.0.0",
+    "croniter>=3.0.3,<4.0.0",
+    "asyncpg>=0.29.0,<0.30.0",
+    "humanize>=4.11.0",
+]
 
-[tool.poetry.scripts]
+[project.scripts]
 private-assistant-alarm-scheduler-skill = "private_assistant_alarm_scheduler_skill.main:app"
+
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "mypy>=1.11.0",
+    "pytest>=8.3.3",
+    "pytest-cov>=6.0.0",
+    "types-croniter>=3.0.3.20240731,<4.0.0",
+    "respx>=0.21.1,<0.22.0",
+    "aiosqlite>=0.20.0,<0.21.0",
+]
 
 [tool.ruff]
 target-version = "py312"
@@ -37,5 +53,39 @@ line-length = 120
 indent-width = 4
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F", "I", "UP"]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "ARG",  # flake8-unused-arguments
+    "PTH",  # flake8-use-pathlib
+    "ERA",  # eradicate
+]
 ignore = ["E203"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra -q"
+
+[tool.coverage.run]
+source = ["private_assistant_alarm_scheduler_skill"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+]

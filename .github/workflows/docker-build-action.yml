@@ -5,9 +5,6 @@ on:
     tags:
       - '*'
 
-env:
-  PYTHON_VERSION: '3.12'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,21 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          # Install a specific version of uv.
+          version: "0.5.9"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }} 
-
-      - name: Install Poetry
-        run: pip install poetry
-
-      - name: Install dependencies with Poetry
-        run: |
-          poetry config virtualenvs.create false
-          poetry install
+          python-version-file: "pyproject.toml"
 
       - name: Build Package
-        run: poetry build
+        run: uv build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

@@ -1,22 +1,24 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED 1
 
-ARG WHEEL_FILE=my_wheel.wh
+# Install uv.
+COPY --from=ghcr.io/astral-sh/uv:0.5.9 /uv /uvx /bin/
 
-# Copy only the wheel file
-COPY dist/${WHEEL_FILE} /tmp/${WHEEL_FILE}
+# Set working directory
+WORKDIR /app
 
-# Install the package
-RUN pip install /tmp/${WHEEL_FILE} && \
-    rm /tmp/${WHEEL_FILE}
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser -s /sbin/nologin -M appuser
 
-RUN groupadd -r pythonuser && useradd -r -m -g pythonuser pythonuser
+# Copy the application into the container.
+COPY pyproject.toml README.md uv.lock /app
+COPY src /app/src
+RUN uv sync --frozen --no-cache
 
-WORKDIR /home/pythonuser
-
-USER pythonuser
+# Set the user to 'appuser'
+USER appuser
 
 ENV PRIVATE_ASSISTANT_CONFIG_PATH=template.yaml
 
-ENTRYPOINT ["private-assistant-alarm-scheduler-skill"]
+CMD ["/app/.venv/bin/private-assistant-alarm-scheduler-skill"]
