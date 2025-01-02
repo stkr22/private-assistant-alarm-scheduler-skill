@@ -1,5 +1,5 @@
 {% if parameters.alarm_time -%}
-The new alarm is set for {{ parameters.alarm_time.strftime('%H:%M') }}.
+The new alarm is set for {{ parameters.format_time() }}.
 {%- else -%}
 No alarm is set.
 {%- endif %}

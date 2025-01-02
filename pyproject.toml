@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "private-assistant-alarm-scheduler-skill"
-version = "1.1.1"
+version = "1.2.0"
 description = "A Python skill for scheduling and managing persistent alarms with support for recurring events, using cron expressions and webhook integration for immediate triggering external alarms."
 authors = [
     { name = "stkr22", email = "stkr22@github.com" }

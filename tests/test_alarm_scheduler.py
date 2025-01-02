@@ -151,7 +151,7 @@ class TestAlarmSchedulerSkill(unittest.IsolatedAsyncioTestCase):
 
                 # Verify that an error log is generated
                 self.mock_logger.error.assert_called_once()
-                self.assertTrue("Failed to trigger alarm" in self.mock_logger.error.call_args[0][0])
+                self.assertTrue("An error occurred while triggering alarm:" in self.mock_logger.error.call_args[0][0])
 
                 # Verify the retry logic
                 mock_set_next_alarm_from_cron.assert_called_once()

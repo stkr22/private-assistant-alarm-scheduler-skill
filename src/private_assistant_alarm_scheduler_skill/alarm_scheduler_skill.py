@@ -15,12 +15,15 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from private_assistant_alarm_scheduler_skill import config, models
+from private_assistant_alarm_scheduler_skill import config, models, tools_time_units
 
 
 class Parameters(BaseModel):
     alarm_time: datetime | None = None
     alarm_name: str = "Default Cron Alarm"
+
+    def format_time(self, with_date: bool = False) -> str:
+        return tools_time_units.format_time_for_tts(self.alarm_time, with_date) if self.alarm_time else ""
 
 
 class Action(enum.Enum):
@@ -57,22 +60,17 @@ class AlarmSchedulerSkill(BaseSkill):
         self.db_engine: AsyncEngine = db_engine
         self.template_env = template_env
         self._active_alarm_task: asyncio.Task | None = None
-        self.action_to_answer: dict[Action, jinja2.Template] = {
-            Action.HELP: template_env.get_template("help.j2"),
-            Action.SET: template_env.get_template("set.j2"),
-            Action.GET_ACTIVE: template_env.get_template("get_active.j2"),
-            Action.SKIP: template_env.get_template("skip.j2"),
-            Action.BREAK: template_env.get_template("break.j2"),
-            Action.CONTINUE: template_env.get_template("continue.j2"),
-        }
+        self.action_to_template: dict[Action, jinja2.Template] = {}
 
-    async def calculate_certainty(self, intent_analysis_result: messages.IntentAnalysisResult) -> float:
-        """Calculate how confident the skill is about handling the given request."""
-        if "alarm" in intent_analysis_result.nouns:
-            return 1.0  # Maximum certainty if "alarm" is detected in the user's request
-        return 0.0
+    def _load_templates(self) -> None:
+        try:
+            for action in Action:
+                self.action_to_template[action] = self.template_env.get_template(f"{action.name.lower()}.j2")
+            self.logger.debug("Templates loaded successfully")
+        except jinja2.TemplateNotFound as e:
+            self.logger.error("Failed to load template: %s", e)
 
-    async def skill_preparations(self) -> None:
+    async def _refresh_alarm(self) -> None:
         async with AsyncSession(self.db_engine) as session:
             statement = select(models.ASSActiveAlarm).where(models.ASSActiveAlarm.scheduled_time > datetime.now())
             query_result = await session.exec(statement)
@@ -80,6 +78,16 @@ class AlarmSchedulerSkill(BaseSkill):
             if active_alarm:
                 self.logger.info("Active alarm found from previous session, starting alarm task.")
                 self.set_next_alarm(active_alarm.scheduled_time)
+
+    async def skill_preparations(self) -> None:
+        self._load_templates()
+        await self._refresh_alarm()
+
+    async def calculate_certainty(self, intent_analysis_result: messages.IntentAnalysisResult) -> float:
+        """Calculate how confident the skill is about handling the given request."""
+        if "alarm" in intent_analysis_result.nouns:
+            return 1.0
+        return 0.0
 
     async def find_parameters(
         self, action: Action, intent_analysis_result: messages.IntentAnalysisResult
@@ -222,7 +230,7 @@ class AlarmSchedulerSkill(BaseSkill):
         self.logger.info("Skipped the next cron iteration and set the alarm for %s.", second_next_execution)
 
     def get_answer(self, action: Action, parameters: Parameters) -> str:
-        template = self.action_to_answer.get(action)
+        template = self.action_to_template.get(action)
         if template:
             answer = template.render(
                 action=action,
