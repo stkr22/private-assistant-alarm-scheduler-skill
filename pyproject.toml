@@ -44,7 +44,7 @@ dev = [
     "pytest-cov~=6.0.0",
     "types-croniter~=5.0.1.20241205",
     "respx~=0.21.1",
-    "aiosqlite~=0.20.0",
+    "aiosqlite~=0.21.0",
 ]
 
 [tool.ruff]
